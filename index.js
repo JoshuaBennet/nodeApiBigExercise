@@ -25,7 +25,7 @@ app.get('/reminders/:id', async (req, res) => {
     res.json(nameData)
 })
 
-app.post('reminder', async (req, res) => {
+app.post('/reminder', async (req, res) => {
     const connection = await MongoClient.connect(url)
     const collection = connection.db('remindersExercise').collection('reminders')
     const newReminderData = {
