@@ -4,49 +4,57 @@ const MongoClient = require('mongodb').MongoClient
 const app = express()
 const port = 3000
 const url = 'mongodb://root:password@localhost:27017'
+app.use(express.json());
 
 app.get('/reminders', async (req, res) => {
-    const connection = await MongoClient.connect(url)
-    const collection = connection.db('remindersExercise').collection('reminders')
-    const names = await collection.find({}).toArray()
-    res.json(names)
+    if (req.query.done === 'true') {
+        const connection = await MongoClient.connect(url)
+        const collection = connection.db('remindersExercise').collection('reminders')
+        const reminders = await collection.find({done: true}).toArray();
+        res.status(200).json({success: true, message: "Retrieved all reminders that are done", data: reminders})
+    } else if (req.query.done === 'false') {
+        const connection = await MongoClient.connect(url)
+        const collection = connection.db('remindersExercise').collection('reminders')
+        const reminders = await collection.find({done: false}).toArray();
+        res.status(200).json({success: true, message: "Retrieved all reminders that are not done", data: reminders})
+    } else {
+        const connection = await MongoClient.connect(url)
+        const collection = connection.db('remindersExercise').collection('reminders')
+        const reminders = await collection.find({}).toArray()
+        res.status(200).json({success: true, message: "Retrieved all reminders", data: reminders})
+    }
 })
 
-
-// filter reminders on if they are done
-
-
-app.get('/reminders/:id', async (req, res) => {
-    const uselessObjectId = req.params._id
-    const objectId = ObjectId(uselessObjectId)
-    const connection = await MongoClient.connect(url)
-    const collection = connection.db('remindersExercise').collection('reminders')
-    const nameData = collection.findOne({_id: objectId})
-    res.json(nameData)
-})
-
-app.post('/reminder', async (req, res) => {
+app.post('/reminders', async (req, res) => {
     const connection = await MongoClient.connect(url)
     const collection = connection.db('remindersExercise').collection('reminders')
     const newReminderData = {
-        deleted: false,
-        done: false,
+        done: req.body.done,
         title: req.body.title
     }
     await collection.insertOne(newReminderData)
     res.sendStatus(200)
 })
 
-app.delete('/reminders/:id', async (req, res) => {
-    const uselessObjectId = req.params.id
+app.delete('/reminders', async (req, res) => {
+    const uselessObjectId = req.query.id
+    // needs to be in try catch, this is a bomb in code
     const objectId = ObjectId(uselessObjectId)
     const connection = await MongoClient.connect(url)
     const collection = connection.db('remindersExercise').collection('reminders')
-    const reminder = collection.deleteOne({_id: objectId})
+    await collection.deleteOne({_id: objectId})
+    res.status(200).json({success: true, message: "Deleted reminder", data: []})
 })
 
 
-// Reminder is done/undone
+app.put('/reminders', async (req, res) => {
+    const uselessObjectId = req.query.id
+    const objectId = ObjectId(uselessObjectId)
+    const connection = await MongoClient.connect(url)
+    const collection = connection.db('remindersExercise').collection('reminders')
+    await collection.updateOne({_id: ObjectId}, {$set: {done: req.body.done}})
+    res.status(200).json({success: true, message: "Updated status", data: []})
+})
 
 
 app.listen(port)
