@@ -10,3 +10,4 @@ app.get('/reminders', async (req, res) => {
     const names = await collection.find({}).toArray()
     res.json(names)
 })
+app.listen(port)
