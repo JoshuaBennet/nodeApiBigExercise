@@ -6,6 +6,8 @@ const port = 3000
 const url = 'mongodb://root:password@localhost:27017'
 app.use(express.json());
 
+// need to functionalize and add the error catching and exceptions
+
 app.get('/reminders', async (req, res) => {
     if (req.query.done === 'true') {
         const connection = await MongoClient.connect(url)
