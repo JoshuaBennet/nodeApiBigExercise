@@ -1,10 +1,12 @@
 const express = require('express')
-const {ObjectId} = require("mongodb");
+const {ObjectId} = require("mongodb")
 const MongoClient = require('mongodb').MongoClient
 const app = express()
-const port = 3000
+const port = 4000
 const url = 'mongodb://root:password@localhost:27017'
-app.use(express.json());
+const cors = require('cors')
+app.use(express.json())
+app.use(cors())
 
 // need to functionalize and add the error catching and exceptions
 
